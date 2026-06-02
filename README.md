@@ -53,7 +53,7 @@ Requires the [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk) an
 ```bash
 cd c-sdk
 mkdir build && cd build
-cmake -DPICO_BOARD=pico_w ..      # or pico2_w for the Pico 2W
+cmake ..                          # default is pico2_w; pass -DPICO_BOARD=pico_w for the original Pico W
 make -j
 ```
 
