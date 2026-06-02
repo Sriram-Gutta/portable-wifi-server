@@ -1,13 +1,12 @@
 import machine
 
-sensor_temp = machine.ADC(4)
-conversion_factor = 3.3 / 65535
+# the internal temperature sensor lives on ADC channel 4
+sensor = machine.ADC(4)
+
 
 def read_temperature():
-    
-    # Reads the internal RP2350 temperature sensor and calculates temperature based on voltage drop. 
-    
-    reading = sensor_temp.read_u16() * conversion_factor
-    # Standard formula for Raspberry Pi silicon internal sensors
-    temperature = 27 - (reading - 0.706) / 0.001721
-    return temperature
+    # convert the 16-bit reading to a voltage between 0 and 3.3V
+    raw = sensor.read_u16()
+    volts = raw * 3.3 / 65535
+    # formula from the datasheet
+    return 27 - (volts - 0.706) / 0.001721

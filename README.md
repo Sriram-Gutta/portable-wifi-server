@@ -40,7 +40,8 @@ portable-wifi-server/
 │   └── make_test_pdf.py         # Builds test.pdf from scratch if you want to change it
 ├── micropython/                 # MicroPython implementation
 │   ├── web_server.py            # AP, socket server, request routing
-│   └── tools.py                 # Internal temperature sensor helper
+│   ├── tools.py                 # Internal temperature sensor helper
+│   └── test.pdf                 # PDF served by the /pdf/test.pdf route
 ├── LICENSE
 └── README.md
 ```
@@ -63,10 +64,11 @@ To swap in your own PDF: drop a `test.pdf` in `c-sdk/`, then regenerate the embe
 ## Running — MicroPython version
 
 1. Flash the [official MicroPython firmware for Pico W / Pico 2W](https://micropython.org/download/) using BOOTSEL + drag-and-drop.
-2. Copy both files in [`micropython/`](micropython/) to the board (Thonny → File → Save to Pico, or `mpremote`):
+2. Copy the three files in [`micropython/`](micropython/) to the board's filesystem (Thonny → File → Save to Pico, or `mpremote cp`):
    ```
    web_server.py
    tools.py
+   test.pdf
    ```
 3. Run `web_server.py`. The Pico prints `AP up at http://192.168.4.1`.
 
@@ -75,6 +77,22 @@ To swap in your own PDF: drop a `test.pdf` in `c-sdk/`, then regenerate the embe
 1. On your phone or laptop, join the Wi-Fi network **`PicoW_Server`** (password `12345678`).
 2. Open a browser to `http://192.168.4.1`.
 3. You'll see the control panel: LED on/off, the live temperature reading, and shutdown.
+
+## Testing without a Pico on hand
+
+If you don't have a Pico W / Pico 2W in front of you, here's what's actually possible — listed from "best signal" to "weakest signal":
+
+1. **[Wokwi](https://wokwi.com/) (browser-based Pico simulator).** Wokwi runs MicroPython on a simulated Pico W in your browser, with a fake serial console. You can paste in `web_server.py` + `tools.py` and watch the script execute — confirming the imports resolve, the AP setup path runs, and the serve loop doesn't crash on startup.
+   - **Caveat:** Wokwi's Wi-Fi simulation is built around the Pico connecting *as a client* to a simulated network (SSID `Wokwi-GUEST`). **AP mode — where the Pico hosts its own network — isn't fully simulated.** The script will start and print to the console, but you can't point a simulated browser at the simulated AP, so you can't click through the routes end-to-end.
+   - **Steps:** Go to wokwi.com → New Project → MicroPython on Raspberry Pi Pico W. Paste `web_server.py` as `main.py`, create a second file `tools.py` with the contents of [`micropython/tools.py`](micropython/tools.py), upload [`micropython/test.pdf`](micropython/test.pdf) via the file panel, hit ▶️.
+
+2. **Compile the C version locally.** You don't need hardware to verify the C code is *correct enough to build* — install the [Pico SDK](https://github.com/raspberrypi/pico-sdk) + an ARM GCC toolchain (`brew install --cask gcc-arm-embedded` on macOS) and run the `cmake` / `make` steps above. A clean `.uf2` build proves the headers, lwIP linkage, and CMake config all line up, even if you can't actually flash it.
+
+3. **Preview just the HTML.** Open `web_server.py` (or `Portable_Wifi_Server.c`) and copy the HTML block into a `.html` file on your laptop. Opening that file in a browser shows you exactly what a client connected to the Pico would see. The forms will 404 (no server behind them) but the look is identical.
+
+4. **Borrow or order a Pico.** A Pico W is around $6, Pico 2W around $7 — by far the most useful "emulator" is the real thing in your hand.
+
+End-to-end testing (real browser ↔ real Pico-hosted AP ↔ live LED toggling, temperature reading, PDF download) does require real hardware. Everything else is a partial picture.
 
 ## Notes on the design
 
