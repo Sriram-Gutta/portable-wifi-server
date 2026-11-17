@@ -6,8 +6,10 @@ This repo contains **two implementations of the same project**:
 
 | Implementation | Language | Path |
 |---|---|---|
-| Bare-metal, lwIP-based | Embedded C/C++ | [`c-sdk/`](c-sdk/) |
+| Pico SDK + lwIP, no RTOS | C | [`c-sdk/`](c-sdk/) |
 | Higher-level, rapid prototype | MicroPython | [`micropython/`](micropython/) |
+
+Built Aug–Sep 2025; published here in June 2026.
 
 The C version is built against the official Pico SDK + lwIP; the MicroPython version uses the `network` and `socket` modules. Both expose the same UX: connect to the `PicoW_Server` SSID, open the IP in a browser, and you get a control page.
 
